@@ -1,5 +1,5 @@
 import express from "express";
-import { uploadToCloudinary } from "../utils/cloudinary.js"; // adjust path if needed
+import { uploadToCloudinary } from "../config/cloudinary.js"; // adjust path if needed
 import { hash } from "bcryptjs";
 import cloudinary from "cloudinary";
 import { UserModel } from "../models/User.js"; // adjust path if needed
