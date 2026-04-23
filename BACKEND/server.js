@@ -5,12 +5,22 @@ import { commonApp } from "./APIs/CommonAPI.js"; // import your CommonAPI routes
 
 dotenv.config();
 
+
+import cors from "cors";
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ✅ Add this line for frontend-backend connection
+app.use(cors({
+  origin: "https://blogappp-80k9.onrender.com" // replace with your actual Render frontend URL
+}));
+
+// middleware
 
 // connect to MongoDB
 
