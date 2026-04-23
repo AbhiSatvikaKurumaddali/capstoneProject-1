@@ -1,8 +1,9 @@
 import express from "express";
 import multer from "multer";
 import { hash } from "bcryptjs";
-import cloudinary, { uploadToCloudinary } from "../config/cloudinary.js"; // helper + configured instance
-import { UserModel } from "../models/User.js"; // adjust path if needed
+import cloudinary from "../config/cloudinary.js";           // configured Cloudinary instance
+import { uploadToCloudinary } from "../config/cloudinaryUpload.js"; // helper function
+import { UserModel } from "../models/UserModel.js";          // adjust if filename differs
 
 const commonApp = express();
 
