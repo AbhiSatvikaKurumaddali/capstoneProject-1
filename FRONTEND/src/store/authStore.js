@@ -37,7 +37,7 @@ export const useAuth = create((set) => ({
     try {
       //set loading state
       //make logout api req
-      let res = await axios.get("http://localhost:4000/auth/logout", { withCredentials: true });
+      let res = await axios.get("mongodb+srv://abhisatvika:abhisatvika@cluster.mongodb.net/MYDB/auth/logout", { withCredentials: true });
       //update state
       if (res.status === 200) {
         set({
@@ -60,7 +60,7 @@ export const useAuth = create((set) => ({
   checkAuth: async () => {
     try {
       set({ loading: true });
-      const res = await axios.get("http://localhost:4000/auth/check-auth", { withCredentials: true });
+      const res = await axios.get("mongodb+srv://abhisatvika:abhisatvika@cluster.mongodb.net/MYDB/auth/check-auth", { withCredentials: true });
 
       set({
         currentUser: res.data.payload,
