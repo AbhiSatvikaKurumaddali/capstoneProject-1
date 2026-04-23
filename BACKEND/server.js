@@ -16,6 +16,10 @@ app.use(cors({
   origin:['http://localhost:5173'],
   credentials:true
 }))
+app.use(cors({
+  origin:['https://capstoneproject-1-1.onrender.com'],
+  credentials:true
+}))
 //add cookie parser middeleware
 app.use(cookieParser())
 //body parser middleware
