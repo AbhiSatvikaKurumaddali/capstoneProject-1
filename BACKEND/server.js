@@ -1,52 +1,30 @@
 import express from "express";
-import { uploadToCloudinary } from "../config/cloudinary.js"; // adjust path if needed
-import { hash } from "bcryptjs";
-import cloudinary from "cloudinary";
-import { UserModel } from "../models/User.js"; // adjust path if needed
-import multer from "multer";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import { commonApp } from "./APIs/CommonAPI.js"; // import your CommonAPI routes
 
-const commonApp = express();
+dotenv.config();
 
-// configure multer (memory storage)
-const upload = multer({ storage: multer.memoryStorage() });
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Route for register
-commonApp.post("/users", upload.single("profileImageUrl"), async (req, res, next) => {
-  let cloudinaryResult;
-  try {
-    const allowedRoles = ["USER", "AUTHOR"];
-    const newUser = req.body;
+// middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-    // validate role
-    if (!allowedRoles.includes(newUser.role)) {
-      return res.status(400).json({ message: "Invalid role" });
-    }
+// connect to MongoDB
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-    // upload image if provided
-    if (req.file) {
-      cloudinaryResult = await uploadToCloudinary(req.file.buffer);
-      newUser.profileImageUrl = cloudinaryResult?.secure_url;
-    }
+// mount APIs
+app.use("/api", commonApp);
 
-    // hash password
-    newUser.password = await hash(newUser.password, 12);
-
-    // create and save user
-    const newUserDoc = new UserModel(newUser);
-    await newUserDoc.save();
-
-    res.status(201).json({ message: "User created" });
-  } catch (err) {
-    console.error("Error creating user:", err);
-
-    // cleanup uploaded image if error occurs
-    if (cloudinaryResult?.public_id) {
-      await cloudinary.uploader.destroy(cloudinaryResult.public_id);
-    }
-
-    next(err);
-  }
+// start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
-
-// export the app so server.js can import it
-export { commonApp };
