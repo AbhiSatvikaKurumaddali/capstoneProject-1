@@ -13,7 +13,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // connect to MongoDB
-import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
