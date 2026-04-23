@@ -16,7 +16,7 @@ function AdminProfile() {
   };
 
   const fetchUsers = async () => {
-    let res = await axios.get("https://blogapp-ppg0.onrender.com/admin-api/users", {
+    let res = await axios.get("https://blogapp-00eh.onrender.com/admin-api/users", {
       withCredentials: true,
     });
     setUsers(res.data.payload);
@@ -28,7 +28,7 @@ function AdminProfile() {
 
   const toggleStatus = async (user) => {
     await axios.patch(
-      "https://blogapp-ppg0.onrender.com/admin-api/user-status",
+      "https://blogapp-00eh.onrender.com/admin-api/user-status",
       {
         userId: user._id,
         isUserActive: !user.isUserActive,
