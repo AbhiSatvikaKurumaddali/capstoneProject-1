@@ -12,7 +12,7 @@ export const useAuth = create((set) => ({
       //set loading true
       set({ loading: true, currentUser: null, isAuthenticated: false, error: null });
       //make api call
-      let res = await axios.post("http://localhost:4000/auth/login", userCred, { withCredentials: true });
+      let res = await axios.post("mongodb+srv://abhisatvika:abhisatvika@cluster.mongodb.net/MYDB/auth/login", userCred, { withCredentials: true });
       //update state
       if (res.status === 200) {
         set({
