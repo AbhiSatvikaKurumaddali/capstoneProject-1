@@ -6,24 +6,39 @@ import { authorApp } from "./APIs/AuthorAPI.js";
 import { adminApp } from "./APIs/AdminAPI.js";
 import { commonApp } from "./APIs/CommonAPI.js";
 import cookieParser from "cookie-parser";
-import cors from 'cors'
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 config();
 
 //create express app
 const app = exp();
-//enable cors
+
+// Enable CORS for production
 app.use(cors({
-  origin:['http://localhost:5173'],
-  credentials:true
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
 }))
-app.use(cors({
-  origin:['https://capstoneproject-1-1.onrender.com'],
-  credentials:true
-}))
-//add cookie parser middeleware
+
+//add cookie parser middleware
 app.use(cookieParser())
+
 //body parser middleware
 app.use(exp.json());
+
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(exp.static(path.join(__dirname, '../frontend/dist')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+  });
+}
+
 //path level middlewares
 app.use("/user-api", userApp);
 app.use("/author-api", authorApp);
@@ -53,7 +68,7 @@ app.use((req, res, next) => {
 
 //Error handling middleware
 app.use((err, req, res, next) => {
-  console.log("error is ",err)
+  console.log("error is ", err);
   console.log("Full error:", JSON.stringify(err, null, 2));
   //ValidationError
   if (err.name === "ValidationError") {
