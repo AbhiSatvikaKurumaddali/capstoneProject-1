@@ -1,4 +1,3 @@
-import { useForm } from "react-hook-form";
 import {
   pageBackground,
   formCard,
@@ -10,12 +9,13 @@ import {
   errorClass,
   mutedText,
   linkClass,
-  loadingClass,
 } from "../styles/common";
-import { NavLink, useNavigate, useLocation } from "react-router";
+
+import { useEffect, useRef } from "react";
+import { NavLink, useNavigate } from "react-router";
+import { useForm } from "react-hook-form";
 import { useAuth } from "../store/authStore";
-import { useEffect } from "react";
-import {toast} from 'react-hot-toast'
+import { toast } from "react-hot-toast";
 
 function Login() {
   const {
@@ -25,46 +25,57 @@ function Login() {
   } = useForm();
 
   const navigate = useNavigate();
-  //get state from auth store
-  const { login, currentUser, loading, error, isAuthenticated } = useAuth((state) => state);
-  //on user login
+
+  const { login, currentUser, loading, isAuthenticated, error } = useAuth(
+    (state) => state,
+  );
+
+  //CLEAN INPUT BEFORE SENDING
   const onUserLogin = (userCredObj) => {
-    //call login() of auth store
-    login(userCredObj);
+    login({
+      email: userCredObj.email.trim().toLowerCase(),
+      password: userCredObj.password.trim(),
+    });
   };
 
+  const hasToasted = useRef(false);
+
   useEffect(() => {
-    //navigation logic
-    if (isAuthenticated === true) {
-      if (currentUser.role === "USER") {
-        //show cuccess toast
-        toast.success("Login success and redirecting to User Profile",{duration:2000})
-        navigate("/user-profile");
-      }
-      if (currentUser.role === "AUTHOR") {
-         toast.success("Login success and redirecting to Author Profile",{duration:2000})
-        navigate("/author-profile");
-      }
-      if (currentUser.role === "ADMIN") {
-         toast.success("Login success and redirecting to Admin Profile",{duration:2000})
-        navigate("/admin-profile");
+    if (isAuthenticated && !hasToasted.current) {
+      hasToasted.current = true;
+
+      if (currentUser?.role === "USER") {
+        toast.success("Login successful, redirecting to user profile");
+        navigate("/UserProfile");
+      } else if (currentUser?.role === "AUTHOR") {
+        toast.success("Login successful, redirecting to author profile");
+        navigate("/Author");
+      } else if (currentUser?.role === "ADMIN") {
+        toast.success("Login successful, redirecting to admin profile");
+        navigate("/AdminProfile");
       }
     }
-  }, [isAuthenticated]);
+  }, [currentUser, isAuthenticated, navigate]);
 
-  //deal with loading
   if (loading) {
-    return <p className={loadingClass}>Loading....</p>;
+    return <p className="loadingclass">Loading...</p>;
   }
 
   return (
-    <div className={`${pageBackground} flex items-center justify-center py-16 px-4`}>
+    <div
+      className={`${pageBackground} flex items-center justify-center py-16 px-4`}
+    >
       <div className={formCard}>
-        {/* Title */}
         <h2 className={formTitle}>Sign In</h2>
 
-        {/* API error */}
-        {error && <p className={errorClass}>{error}</p>}
+        
+        {error && (
+          <p className={errorClass}>
+            {typeof error === "string"
+              ? error
+              : error?.message || "Login failed"}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit(onUserLogin)}>
           {/* Email */}
@@ -76,11 +87,13 @@ function Login() {
               className={inputClass}
               {...register("email", {
                 required: "Email is required",
-
-                validate: (value) => value.trim().length > 0 || "Email cannot be empty",
+                validate: (value) =>
+                  value.trim().length > 0 || "Email cannot be empty",
               })}
             />
-            {errors.email && <p className={errorClass}>{errors.email.message}</p>}
+            {errors.email && (
+              <p className={errorClass}>{errors.email.message}</p>
+            )}
           </div>
 
           {/* Password */}
@@ -92,26 +105,26 @@ function Login() {
               className={inputClass}
               {...register("password", {
                 required: "Password is required",
-                validate: (value) => value.trim().length > 0 || "Password cannot be empty",
+                validate: (value) =>
+                  value.trim().length > 0 || "Password cannot be empty",
               })}
             />
-            {errors.password && <p className={errorClass}>{errors.password.message}</p>}
+            {errors.password && (
+              <p className={errorClass}>{errors.password.message}</p>
+            )}
           </div>
 
-          {/* Forgot password */}
           <div className="text-right -mt-2 mb-4">
             <a href="/forgot-password" className={`${linkClass} text-xs`}>
               Forgot password?
             </a>
           </div>
 
-          {/* Submit */}
           <button type="submit" className={submitBtn}>
             Sign In
           </button>
         </form>
 
-        {/* Footer */}
         <p className={`${mutedText} text-center mt-5`}>
           Don't have an account?{" "}
           <NavLink to="/register" className={linkClass}>
