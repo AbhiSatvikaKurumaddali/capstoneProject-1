@@ -1,43 +1,46 @@
-import express from "express";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
-import { commonApp } from "./APIs/CommonAPI.js"; // import your CommonAPI routes
-
-dotenv.config();
-
-
+import exp from "express";
+import { config } from "dotenv";
+import { connect } from "mongoose";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+import { userApp } from "./API/userAPI.js";
+import { adminApp } from "./API/adminAPI.js";
+import { authorApp } from "./API/authorAPI.js";
+import { commonApp } from "./API/commonAPI.js";
 
-// middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+config();
 
-// ✅ Add this line for frontend-backend connection
-app.use(cors({
-  origin: "https://blogappp-80k9.onrender.com" // replace with your actual Render frontend URL
-}));
+const app = exp();
 
-// middleware
+app.use(exp.json());
+app.use(cookieParser());
 
-// connect to MongoDB
+app.use(
+  cors({
+    origin: ["https://blogappp-80k9.onrender.com"
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  })
+);
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.DB_URL);
-    console.log("DB server connected");
-  } catch (err) {
-    console.error("MongoDB connection error:", err);
-  }
-};
+app.use("/user-api", userApp);
+app.use("/admin-api", adminApp);
+app.use("/author-api", authorApp);
+app.use("/common-api", commonApp);
 
-
-// mount APIs
-app.use("/api", commonApp);
-
-// start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
 });
+
+connect(process.env.DB_URL)
+  .then(() => {
+    const PORT = process.env.PORT || 4000;
+    app.listen(PORT, () => {
+      console.log("Server running");
+    });
+  })
+  .catch((err) => {
+    console.log("DB error:", err);
+  });
