@@ -1,7 +1,7 @@
 import exp from "express";
 import { hash, compare } from "bcryptjs";
 import { UserModel } from "../models/UserModel.js";
-import { verifyToken } from "../middlewares/verifyToken.js";
+import { verifyToken } from "../middlewares/VerifyToken.js";
 import { config } from "dotenv";
 import jwt from "jsonwebtoken";
 
