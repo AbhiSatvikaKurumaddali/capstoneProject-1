@@ -4,10 +4,10 @@ import { connect } from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import { userApp } from "./API/userAPI.js";
-import { adminApp } from "./API/adminAPI.js";
-import { authorApp } from "./API/authorAPI.js";
-import { commonApp } from "./API/commonAPI.js";
+import { userApp } from "./API/UserAPI.js";
+import { adminApp } from "./API/AdminAPI.js";
+import { authorApp } from "./API/AuthorAPI.js";
+import { commonApp } from "./API/CommonAPI.js";
 
 config();
 
