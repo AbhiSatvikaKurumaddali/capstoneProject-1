@@ -7,8 +7,8 @@ import verifyToken from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
-// REGISTER endpoint (MOVED HERE from commonAPI)
-router.post("/Register", async (req, res) => {
+// REGISTER endpoint - NOW USING LOWERCASE /register
+router.post("/register", async (req, res) => {
   try {
     console.log("Registration request received:", req.body);
     
@@ -28,7 +28,7 @@ router.post("/Register", async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Create user (ensure role is uppercase to match your model)
+    // Create user
     let userRole = "USER";
     if (role && role.toUpperCase() === "AUTHOR") userRole = "AUTHOR";
     if (role && role.toUpperCase() === "ADMIN") userRole = "ADMIN";
