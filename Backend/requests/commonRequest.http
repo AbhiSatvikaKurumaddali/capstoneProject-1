@@ -1,0 +1,73 @@
+### Register a new user (role = AUTHOR)
+POST http://localhost:5000/common-api/users
+Content-Type: application/json
+
+{
+  "firstName": "author1",
+  "lastName": "",
+  "email": "author1@gmail.com",
+  "role": "AUTHOR",
+  "password": "author1",
+  "profileImageUrl": ""
+}
+
+### Register a new user (role = USER)
+POST http://localhost:5000/common-api/users
+Content-Type: application/json
+
+{
+  "firstName": "user1",
+  "lastName": "",
+  "email": "user1@gmail.com",
+  "role": "USER",
+  "password": "User1",
+  "profileImageUrl": ""
+}
+
+
+### Register a new admin (role = ADMIN)
+POST http://localhost:5000/common-api/users
+Content-Type: application/json
+
+{
+  "firstName": "admin1",
+  "lastName": "",
+  "email": "admin1@gmail.com",
+  "role": "ADMIN",
+  "password": "Admin1",
+  "profileImageUrl": ""
+}
+
+
+
+### User login
+POST http://localhost:5000/common-api/login
+Content-Type: application/json
+
+{
+  "email": "user1@gmail.com",
+  "password": "User1"
+}
+
+### Author login
+POST http://localhost:5000/common-api/login
+Content-Type: application/json
+
+{
+  "email": "author1@gmail.com",
+  "password": "author1"
+}
+
+### Logout (works for both user and author)
+GET http://localhost:5000/common-api/logout
+Authorization: Bearer <TOKEN>
+
+### Change password (works for both user and author)
+PUT http://localhost:5000/common-api/password
+Authorization: Bearer <TOKEN>
+Content-Type: application/json
+
+{
+  "currentPassword": "user1",
+  "newPassword": "User1"
+}

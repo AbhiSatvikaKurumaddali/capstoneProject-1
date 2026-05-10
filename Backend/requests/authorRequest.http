@@ -1,0 +1,19 @@
+### Create a new article (Author role)
+POST http://localhost:5000/author-api/articles
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDA1YjllZjA2NzI4N2NjYzliNTE4YiIsInJvbGUiOiJBVVRIT1IiLCJpYXQiOjE3Nzg0MDgzODIsImV4cCI6MTc3ODQxMTk4Mn0.nCSa5HTw3-TNVEH9hiZX9pLcq2HIf78Jn556HcQPCaI
+Content-Type: application/json
+
+{
+    "title": "My First Blog",
+    "content": "This is the content of my first blog."
+}
+
+### Edit own article (Author role)
+PUT http://localhost:5000/author-api/articles/6a006d96f067287ccc9b5191
+Authorization: BearereyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDA1YjllZjA2NzI4N2NjYzliNTE4YiIsInJvbGUiOiJBVVRIT1IiLCJpYXQiOjE3Nzg0MDgzODIsImV4cCI6MTc3ODQxMTk4Mn0.nCSa5HTw3-TNVEH9hiZX9pLcq2HIf78Jn556HcQPCaI
+Content-Type: application/json
+
+{
+    "title": "Updated Blog Title",
+    "content": "Updated content goes here."
+}
