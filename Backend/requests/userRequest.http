@@ -1,13 +1,46 @@
-### Read articles of all authors (User role)
-GET http://localhost:5000/user-api/articles
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDA1YzcwZjA2NzI4N2NjYzliNTE4YyIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzc4NDA4NTY2LCJleHAiOjE3Nzg0MTIxNjZ9.rYI2zzJkiK4x2JGZNzOc01QwL3B9r4zTggCo3lIClLY
-
-### Add comments to articles (User role)
-PUT http://localhost:5000/user-api/articles
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDA1YzcwZjA2NzI4N2NjYzliNTE4YyIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzc4NDA4NTY2LCJleHAiOjE3Nzg0MTIxNjZ9.rYI2zzJkiK4x2JGZNzOc01QwL3B9r4zTggCo3lIClLY
+###register user
+POST http://localhost:4000/common-api/users
 Content-Type: application/json
 
 {
-    "articleId": "69b3a9e7e5d5192de030eb7f",
-    "comment": "This article is useful"
+    "firstName":"author1",
+    "lastName":"",
+    "email":"author1@gmail.com",
+    "role":"AUTHOR",
+    "password":"author1",
+    "profileImageUrl":""
+}
+
+###user login
+
+POST http://localhost:4000/common-api/login
+Content-Type: application/json
+
+{
+    "email":"user1@gmail.com",
+    "password":"User1"
+}
+
+###user logout
+GET http://localhost:4000/common-api/logout
+
+####read articles of all authors
+GET http://localhost:4000/user-api/articles
+
+###add comments to articles
+PUT http://localhost:4000/user-api/articles
+Content-Type: application/json
+
+{
+    "articleId":"69b3a9e7e5d5192de030eb7f",
+    "comment":"this article is useful"
+}
+
+###change password
+PUT http://localhost:4000/common-api/password
+Content-Type: application/json
+
+{
+    "currentPassword":"user1",
+    "newPassword":"User1"
 }
