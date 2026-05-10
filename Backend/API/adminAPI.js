@@ -1,69 +1,60 @@
-import express from "express";
-import Article from "../models/articleModel.js";
-import User from "../models/userModel.js";
-import verifyToken from "../middleware/verifyToken.js";
+import exp from "express";
+import { verifyToken } from "../middlewares/verifyToken.js";
+import { UserModel } from "../models/UserModel.js";
+export const adminApp = exp.Router();
 
-const router = express.Router();
-
-// Get all pending articles
-router.get("/articles", verifyToken, async (req, res) => {
-  // Check if user is admin
-  if (req.user.role !== "ADMIN") {
-    return res.status(403).json({ message: "Not authorized" });
-  }
-  
-  const articles = await Article.find({ published: false });
-  res.json(articles);
+//route for reading all users and authors
+adminApp.get("/emails", verifyToken("ADMIN"), async (req, res) => {
+  //get email from database of role users and authors
+  const usersDetails = await UserModel.find(
+    { role: "USER" },
+    { email: 1, _id: 1, firstName: 1, isUserActive: 1 }, 
+  );
+  const authorsDetails = await UserModel.find(
+    { role: "AUTHOR" },
+    { email: 1, _id: 1, firstName: 1, isUserActive: 1 }, 
+  );
+  //send back response
+  res
+    .status(200)
+    .json({
+      message: "Users and Authors",
+      USERS: usersDetails,
+      AUTHORS: authorsDetails,
+    });
 });
 
-// Approve article
-router.put("/articles/:id/approve", verifyToken, async (req, res) => {
-  if (req.user.role !== "ADMIN") {
-    return res.status(403).json({ message: "Not authorized" });
+//route to activate or block users or authors
+adminApp.put("/userStatus", verifyToken("ADMIN"), async (req, res) => {
+  //get the details from the req body
+  const { email, isUserActive } = req.body;
+
+  //check whether the user with that email exists in db
+  const userDetails = await UserModel.findOne(
+    { email: email },
+    { email: 1, _id: 0, isUserActive: 1 },
+  );
+
+  if (!userDetails) {
+    return res
+      .status(404)
+      .json({ message: "user with that email does not exist" });
   }
-  
-  const article = await Article.findById(req.params.id);
-  if (!article) return res.status(404).json({ message: "Article not found" });
 
-  article.published = true;
-  await article.save();
-  res.json({ message: "Article approved successfully", article });
-});
-
-// Get all users
-router.get("/users", verifyToken, async (req, res) => {
-  if (req.user.role !== "ADMIN") {
-    return res.status(403).json({ message: "Not authorized" });
+  //check the user status and req body status
+  //if they are same send res that it is already activated or blocked
+  if (userDetails.isUserActive === isUserActive) {
+    return res
+      .status(400)
+      .json({ message: "Status of user is same.No need to update" });
   }
-  
-  const users = await User.find();
-  res.json(users);
+
+  //if they are not same update them
+  await UserModel.findOneAndUpdate(
+    { email: email },
+    { isUserActive: isUserActive },
+    { new: true },
+  );
+
+  res.status(200).json({ message: "Status is updated" });
 });
-
-// Promote user
-router.put("/users/:id/promote", verifyToken, async (req, res) => {
-  if (req.user.role !== "ADMIN") {
-    return res.status(403).json({ message: "Not authorized" });
-  }
-  
-  const { role } = req.body;
-  const user = await User.findById(req.params.id);
-  if (!user) return res.status(404).json({ message: "User not found" });
-
-  user.role = role;
-  await user.save();
-  res.json(user);
-});
-
-// Delete user
-router.delete("/users/:id", verifyToken, async (req, res) => {
-  if (req.user.role !== "ADMIN") {
-    return res.status(403).json({ message: "Not authorized" });
-  }
-  
-  const user = await User.findByIdAndDelete(req.params.id);
-  if (!user) return res.status(404).json({ message: "User not found" });
-  res.json({ message: "User deleted successfully" });
-});
-
-export default router;
