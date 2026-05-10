@@ -1,30 +1,67 @@
-import jwt from 'jsonwebtoken';
+import express from "express";
+import { verifyToken } from "../middlewares/verifyToken.js";
+import { ArticleModel } from "../models/ArticleModel.js";
 
-export const verifyToken = (...allowedRoles) => {
-  return (req, res, next) => {
-    try {
-      // Get token from cookies (since you're using httpOnly cookies)
-      const token = req.cookies.token;
-      
-      if (!token) {
-        return res.status(401).json({ message: "Access denied. No token provided." });
-      }
-      
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
-      // Check if user has required role
-      if (allowedRoles.length > 0 && !allowedRoles.includes(decoded.role)) {
-        return res.status(403).json({ 
-          message: `Access denied. ${decoded.role} role not authorized.` 
-        });
-      }
-      
-      // Attach user info to request
-      req.user = decoded;
-      next();
-    } catch (err) {
-      return res.status(401).json({ message: "Invalid or expired token" });
+export const userApp = express.Router();
+
+// Read articles of all authors
+userApp.get("/articles", verifyToken("USER"), async (req, res) => {
+  try {
+    const articleList = await ArticleModel.find({ isArticleActive: true });
+    res.status(200).json({ 
+      message: "Articles fetched successfully", 
+      payload: articleList 
+    });
+  } catch (err) {
+    console.error("Error fetching articles:", err);
+    res.status(500).json({ 
+      message: "Server error", 
+      error: err.message 
+    });
+  }
+});
+
+// Add comments to an article
+userApp.put("/articles", verifyToken("USER"), async (req, res) => {
+  try {
+    const { articleId, comment } = req.body;
+    
+    if (!articleId || !comment) {
+      return res.status(400).json({ 
+        message: "Article ID and comment are required" 
+      });
     }
-  };
-};
+    
+    const articleDocument = await ArticleModel.findOne({ 
+      _id: articleId, 
+      isArticleActive: true 
+    });
+    
+    if (!articleDocument) {
+      return res.status(404).json({ 
+        message: "Article not found" 
+      });
+    }
+    
+    const userId = req.user?.id;
+    
+    articleDocument.comments.push({ 
+      user: userId, 
+      comment: comment,
+      createdAt: new Date()
+    });
+    
+    await articleDocument.save();
+    
+    res.status(200).json({ 
+      message: "Comment added successfully", 
+      payload: articleDocument 
+    });
+  } catch (err) {
+    console.error("Error adding comment:", err);
+    res.status(500).json({ 
+      message: "Server error", 
+      error: err.message 
+    });
+  }
+});
