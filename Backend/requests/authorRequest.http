@@ -1,19 +1,43 @@
-### Create a new article (Author role)
-POST http://localhost:5000/author-api/articles
-Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDA1YjllZjA2NzI4N2NjYzliNTE4YiIsInJvbGUiOiJBVVRIT1IiLCJpYXQiOjE3Nzg0MDgzODIsImV4cCI6MTc3ODQxMTk4Mn0.nCSa5HTw3-TNVEH9hiZX9pLcq2HIf78Jn556HcQPCaI
+###create new article
+POST http://localhost:4000/author-api/article
 Content-Type: application/json
 
 {
-    "title": "My First Blog",
-    "content": "This is the content of my first blog."
+    "author":"69e9ff54366476d586ae618a",
+    "title":"Article by sravanya",
+    "category":"programming",
+    "content":"test article on programming"
 }
 
-### Edit own article (Author role)
-PUT http://localhost:5000/author-api/articles/6a006d96f067287ccc9b5191
-Authorization: BearereyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDA1YjllZjA2NzI4N2NjYzliNTE4YiIsInJvbGUiOiJBVVRIT1IiLCJpYXQiOjE3Nzg0MDgzODIsImV4cCI6MTc3ODQxMTk4Mn0.nCSa5HTw3-TNVEH9hiZX9pLcq2HIf78Jn556HcQPCaI
+###read own article
+GET http://localhost:4000/author-api/article
+
+###user login
+
+POST http://localhost:4000/common-api/login
 Content-Type: application/json
 
 {
-    "title": "Updated Blog Title",
-    "content": "Updated content goes here."
+    "email":"author1@gmail.com",
+    "password":"author1"
+}
+
+###edit article
+PUT http://localhost:4000/author-api/article
+Content-Type: application/json
+
+{
+    "articleId":"69b3da2351a63542dcdef84a",
+    "title":"Article 1 by Author 1",
+    "category":"AI",
+    "content":"test article on AI and is updated"
+}
+
+###delete/restoring the article(soft article)
+PATCH http://localhost:4000/author-api/article
+Content-Type: application/json
+
+{
+    "articleId":"69b3da2351a63542dcdef84a",
+    "isArticleActive":true
 }
