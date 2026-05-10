@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../store/authStore";
@@ -27,10 +26,15 @@ function AdminProfile() {
 
       console.log("API RESPONSE:", res.data);
 
+      // FIXED: Handle the response structure correctly
       setUsers(res.data.USERS || []);
       setAuthors(res.data.AUTHORS || []);
     } catch (err) {
       console.error("Fetch error:", err);
+      // Handle 401/403 errors
+      if (err.response?.status === 401) {
+        navigate("/login");
+      }
     }
   };
 
@@ -43,13 +47,13 @@ function AdminProfile() {
       await axios.put(
         "https://blogapp-00eh.onrender.com/admin-api/userStatus",
         {
-          email: user.email, //FIXED (was userId before)
+          email: user.email, // Good - using email
           isUserActive: !user.isUserActive,
         },
         { withCredentials: true },
       );
 
-      fetchUsers();
+      fetchUsers(); // Refresh the list
     } catch (err) {
       console.error("Status update error:", err.response?.data || err.message);
     }
@@ -64,22 +68,26 @@ function AdminProfile() {
       ) : (
         list.map((user) => (
           <div
-            key={user.email} // unique key fix
+            key={user.email || user._id} // FIXED: Use email or _id
             className="border p-4 mb-3 rounded flex justify-between items-center"
           >
             <div>
-              <p>{user.firstName}</p>
+              {/* FIXED: Handle different field names */}
+              <p className="font-medium">
+                {user.username || user.firstName || user.email}
+              </p>
               <p className="text-sm text-gray-500">{user.email}</p>
-              <p>Status: {user.isUserActive ? "Active" : "Blocked"}</p>
+              <p>Status: {user.isUserActive !== false ? "Active" : "Blocked"}</p>
+              <p className="text-xs text-gray-400">Role: {user.role}</p>
             </div>
 
             <button
               onClick={() => toggleStatus(user)}
               className={`px-4 py-2 text-white rounded ${
-                user.isUserActive ? "bg-red-500" : "bg-green-500"
+                user.isUserActive !== false ? "bg-red-500" : "bg-green-500"
               }`}
             >
-              {user.isUserActive ? "Block" : "Unblock"}
+              {user.isUserActive !== false ? "Block" : "Unblock"}
             </button>
           </div>
         ))
@@ -93,17 +101,21 @@ function AdminProfile() {
       <div className="bg-white border rounded-3xl p-6 mb-8 shadow-sm flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-xl">
-            {currentUser?.firstName?.charAt(0).toUpperCase()}
+            {currentUser?.username?.charAt(0).toUpperCase() || 
+             currentUser?.email?.charAt(0).toUpperCase()}
           </div>
 
           <div>
             <p className="text-sm text-gray-500">Admin Panel</p>
-            <h2 className="text-xl font-semibold">{currentUser?.firstName}</h2>
+            <h2 className="text-xl font-semibold">
+              {currentUser?.username || currentUser?.email}
+            </h2>
+            <p className="text-sm text-gray-500">{currentUser?.email}</p>
           </div>
         </div>
 
         <button
-          className="bg-red-500 text-white px-5 py-2 rounded-full"
+          className="bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600"
           onClick={onLogout}
         >
           Logout
