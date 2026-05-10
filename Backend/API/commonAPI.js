@@ -11,13 +11,9 @@ const { sign } = jwt;
 
 export const commonApp = exp.Router();
 
-// REMOVE THIS - Registration should be in userAPI.js, not here
-// commonApp.post("/users", async (req, res) => { ... });
-
-// LOGIN - Fixed
 commonApp.post("/login", async (req, res) => {
   console.log("Login route hit");
-  console.log("Request body:", req.body); // Debug log
+  console.log("Request body:", req.body); 
   
   try {
     const { email, password } = req.body;
@@ -41,7 +37,7 @@ commonApp.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // FIXED: Use JWT_SECRET (not SECRET_KEY) to match your Render env variable
+   
     const signedToken = sign(
       { id: user._id, email: email, role: user.role },
       process.env.JWT_SECRET,  // Changed from SECRET_KEY
@@ -70,7 +66,7 @@ commonApp.post("/login", async (req, res) => {
   }
 });
 
-// LOGOUT - Fixed
+// LOGOUT 
 commonApp.get("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
@@ -82,7 +78,7 @@ commonApp.get("/logout", (req, res) => {
   res.status(200).json({ message: "Logout success" });
 });
 
-// CHECK AUTH - Fixed
+// CHECK AUTH 
 commonApp.get("/check-auth", (req, res) => {
   try {
     const token = req.cookies.token;
@@ -93,7 +89,7 @@ commonApp.get("/check-auth", (req, res) => {
       });
     }
 
-    // FIXED: Use JWT_SECRET (not SECRET_KEY)
+   
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     res.status(200).json({
@@ -108,7 +104,7 @@ commonApp.get("/check-auth", (req, res) => {
   }
 });
 
-// Password update - Keep as is
+// Password update 
 commonApp.put(
   "/password",
   verifyToken("USER", "AUTHOR", "ADMIN"),
