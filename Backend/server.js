@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URL);
+mongoose.connect(process.env.MONGO_URI);
 
 app.use("/common-api", commonAPI);
 app.use("/user-api", userAPI);
