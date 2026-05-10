@@ -6,10 +6,27 @@ export default function RegisterForm() {
 
   const handleRegister = async () => {
     try {
-      await API.post("/common-api/users", form);
-      alert("Registered successfully! Please login.");
-    } catch {
-      alert("Registration failed");
+      // ✅ FIXED: Changed from /common-api/users to /user-api/register
+      const response = await API.post("/user-api/register", form);
+      console.log("Registration success:", response.data);
+      
+      // Save the token and user data
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      
+      alert("Registered successfully!");
+      
+      // Redirect based on role
+      if (response.data.user.role === "ADMIN") {
+        window.location.href = "/admin-dashboard";
+      } else if (response.data.user.role === "AUTHOR") {
+        window.location.href = "/author-dashboard";
+      } else {
+        window.location.href = "/user-dashboard";
+      }
+    } catch (error) {
+      console.error("Registration failed:", error.response?.data);
+      alert(error.response?.data?.message || "Registration failed");
     }
   };
 
