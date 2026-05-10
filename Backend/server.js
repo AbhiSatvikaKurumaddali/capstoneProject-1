@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import cors from "cors";  // ADD THIS
+import cors from "cors";
 import commonAPI from "./API/commonAPI.js";
 import userAPI from "./API/userAPI.js";
 import authorAPI from "./API/authorAPI.js";
@@ -10,20 +10,20 @@ import adminAPI from "./API/adminAPI.js";
 dotenv.config();
 const app = express();
 
-// ADD CORS CONFIGURATION (place this BEFORE your routes)
+// CORS configuration
 app.use(cors({
   origin: [
-    'https://blogappp-80k9.onrender.com',  // Your frontend URL
-    'http://localhost:5173',  // Vite default port
-    'http://localhost:3000',  // Alternative local port
-    'http://localhost:5000'   // Your backend port
+    'https://blogappp-80k9.onrender.com',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:5000'
   ],
   credentials: true
 }));
 
 app.use(express.json());
 
-// ADD A ROOT ROUTE (to fix 404 when visiting the backend URL)
+// Root route
 app.get('/', (req, res) => {
   res.json({
     message: 'BlogApp API is running',
@@ -36,8 +36,8 @@ app.get('/', (req, res) => {
     }
   });
 });
-  
-// ADD A HEALTH CHECK ENDPOINT (good for Render monitoring)
+
+// Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'ok', 
@@ -46,13 +46,18 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Your existing routes
+// Test endpoint to verify userAPI is loaded
+app.get('/test-user-api', (req, res) => {
+  res.json({ message: "userAPI is available at /user-api" });
+});
+
+// Your routes
 app.use("/common-api", commonAPI);
 app.use("/user-api", userAPI);
 app.use("/author-api", authorAPI);
 app.use("/admin-api", adminAPI);
 
-// MongoDB connection with better error handling
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected successfully"))
   .catch(err => {
