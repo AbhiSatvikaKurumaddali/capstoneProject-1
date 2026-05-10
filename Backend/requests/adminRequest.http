@@ -1,30 +1,22 @@
-### Admin login
-POST http://localhost:5000/common-api/login
+###admin login
+POST http://localhost:4000/common-api/login
 Content-Type: application/json
 
 {
-    "email": "admin1@gmail.com",
-    "password": "Admin1"
+    "email":"admin@gmail.com",
+    "password":"admin"
 }
 
-### Approve an article (Admin only)
-PUT http://localhost:5000/admin-api/articles/<ARTICLE_ID>/approve
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDA1ZGE0ZjA2NzI4N2NjYzliNTE4ZCIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3ODQwODg3NCwiZXhwIjoxNzc4NDEyNDc0fQ.GcS7cnJUlqVGmzz3DiAiTD00kxzs0gihNjKxnqq3zbc
+###read all users and authors(email)
 
-### Promote a user to AUTHOR
-PUT http://localhost:5000/admin-api/users/<USER_ID>/promote
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDA1ZGE0ZjA2NzI4N2NjYzliNTE4ZCIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3ODQwODg3NCwiZXhwIjoxNzc4NDEyNDc0fQ.GcS7cnJUlqVGmzz3DiAiTD00kxzs0gihNjKxnqq3zbc
+GET http://localhost:4000/admin-api/emails
+
+###block or activate user or author
+
+PUT http://localhost:4000/admin-api/userStatus
 Content-Type: application/json
 
 {
-    "role": "AUTHOR"
-}
-
-### Promote a user to ADMIN
-PUT http://localhost:5000/admin-api/users/<USER_ID>/promote
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDA1ZGE0ZjA2NzI4N2NjYzliNTE4ZCIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3ODQwODg3NCwiZXhwIjoxNzc4NDEyNDc0fQ.GcS7cnJUlqVGmzz3DiAiTD00kxzs0gihNjKxnqq3zbc
-Content-Type: application/json
-
-{
-    "role": "ADMIN"
+    "email":"user1@gmail.com",
+    "isUserActive":true
 }
