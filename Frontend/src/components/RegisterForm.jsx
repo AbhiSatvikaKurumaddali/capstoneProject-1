@@ -7,7 +7,7 @@ export default function RegisterForm() {
   const handleRegister = async () => {
     try {
       // ✅ FIXED: Changed from /common-api/users to /user-api/register
-      const response = await API.post("/user-api/register", form);
+      const response = await API.post("/user-api/Register", form);
       console.log("Registration success:", response.data);
       
       // Save the token and user data
