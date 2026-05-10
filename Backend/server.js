@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
     }
   });
 });
-
+  
 // ADD A HEALTH CHECK ENDPOINT (good for Render monitoring)
 app.get('/health', (req, res) => {
   res.status(200).json({ 
