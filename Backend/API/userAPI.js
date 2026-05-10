@@ -1,128 +1,59 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/userModel.js"; 
+import User from "../models/userModel.js";
 import Article from "../models/articleModel.js";
 import verifyToken from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
-
-
-// REGISTER endpoint
+// REGISTER endpoint (MOVED HERE from commonAPI)
 router.post("/register", async (req, res) => {
   try {
     console.log("Registration request received:", req.body);
     
-    const { firstName, lastName, email, password, role } = req.body;
+    const { firstName, lastName, email, password, role, profileImageUrl } = req.body;
     
     // Validation
     if (!firstName || !lastName || !email || !password) {
-      return res.status(400).json({ 
-        message: "All fields are required" 
-      });
-    }
-    
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ 
-        message: "User already exists with this email" 
-      });
-    }
-    
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    
-    // Create new user
-    const newUser = new User({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-      role: role || 'user' 
-    });
-    
-    await newUser.save();
-    
-    // Create JWT token
-    const token = jwt.sign(
-      { 
-        userId: newUser._id, 
-        email: newUser.email, 
-        role: newUser.role 
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-    
-    // Return success response
-    res.status(201).json({
-      message: "User registered successfully",
-      token,
-      user: {
-        id: newUser._id,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        email: newUser.email,
-        role: newUser.role
-      }
-    });
-  } catch (error) {
-    console.error("Registration error:", error);
-    res.status(500).json({ 
-      message: "Server error during registration",
-      error: error.message 
-    });
-  }
-});
-
-// LOGIN endpoint
-router.post("/login", async (req, res) => {
-  try {
-    console.log("Login request received:", req.body.email);
-    
-    const { email, password } = req.body;
-    
-    // Validation
-    if (!email || !password) {
-      return res.status(400).json({ 
-        message: "Email and password are required" 
-      });
+      return res.status(400).json({ message: "All fields are required" });
     }
     
     // Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ 
-        message: "Invalid email or password" 
-      });
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
     }
     
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ 
-        message: "Invalid email or password" 
-      });
-    }
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Create JWT token
+    // Create user (ensure role is uppercase to match your model)
+    let userRole = "USER";
+    if (role && role.toUpperCase() === "AUTHOR") userRole = "AUTHOR";
+    if (role && role.toUpperCase() === "ADMIN") userRole = "ADMIN";
+    
+    const user = new User({ 
+      firstName, 
+      lastName, 
+      email, 
+      password: hashedPassword, 
+      role: userRole, 
+      profileImageUrl 
+    });
+    
+    await user.save();
+    
+    // Create token
     const token = jwt.sign(
-      { 
-        userId: user._id, 
-        email: user.email, 
-        role: user.role 
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      { id: user._id, role: user.role }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: "7d" }
     );
     
-    // Return success response
-    res.json({
-      message: "Login successful",
-      token,
+    res.status(201).json({ 
+      message: "User registered successfully",
+      token, 
       user: {
         id: user._id,
         firstName: user.firstName,
@@ -132,15 +63,42 @@ router.post("/login", async (req, res) => {
       }
     });
   } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ 
-      message: "Server error during login",
-      error: error.message 
-    });
+    console.error("Registration error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
+// LOGIN endpoint
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(401).json({ message: "Invalid credentials" });
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: "7d" }
+    );
+    
+    res.json({ 
+      message: "Login successful",
+      token, 
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 // Get all published articles
 router.get("/articles", verifyToken, async (req, res) => {
