@@ -1,33 +1,30 @@
-import exp from 'express';
-import {verifyToken} from '../middlewares/verifyToken.js';
-import {ArticleModel} from '../models/ArticleModel.js';
-export const userApp=exp.Router()
+import jwt from 'jsonwebtoken';
 
-//read articles of all authors
-userApp.get("/articles",verifyToken("USER"),async(req,res)=>
-{
-    //read articles
-    const articleList=await ArticleModel.find({isArticleActive:true})
-    //send res
-    res.status(200).json({message:"articles",payload:articleList})
-})
-
-//add comments to an article
-userApp.put("/articles",verifyToken("USER"),async(req,res)=>{
-    //get the body from req
-    const {articleId,comment}=req.body
-    //check for the article id in article model
-    const articleDocument=await ArticleModel.findOne({_id:articleId,isArticleActive:true});
-    if(!articleDocument)
-    {
-        return res.status(404).json({message:"article not found"})
-    };
-    //get user id
-    const userId=req.user?.id;
-    //add comment tocomments array of that particular article
-    articleDocument.comments.push({user:userId,comment:comment});
-    //save
-    await articleDocument.save()
-    //send res
-    res.status(200).json({message:"Comment added",payload:articleDocument});
-})
+export const verifyToken = (...allowedRoles) => {
+  return (req, res, next) => {
+    try {
+      // Get token from cookies (since you're using httpOnly cookies)
+      const token = req.cookies.token;
+      
+      if (!token) {
+        return res.status(401).json({ message: "Access denied. No token provided." });
+      }
+      
+      // Verify token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      // Check if user has required role
+      if (allowedRoles.length > 0 && !allowedRoles.includes(decoded.role)) {
+        return res.status(403).json({ 
+          message: `Access denied. ${decoded.role} role not authorized.` 
+        });
+      }
+      
+      // Attach user info to request
+      req.user = decoded;
+      next();
+    } catch (err) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+  };
+};
