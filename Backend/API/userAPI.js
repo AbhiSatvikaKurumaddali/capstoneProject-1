@@ -8,7 +8,7 @@ import verifyToken from "../middleware/verifyToken.js";
 const router = express.Router();
 
 // REGISTER endpoint (MOVED HERE from commonAPI)
-router.post("/register", async (req, res) => {
+router.post("/Register", async (req, res) => {
   try {
     console.log("Registration request received:", req.body);
     
