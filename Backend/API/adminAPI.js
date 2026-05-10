@@ -7,16 +7,23 @@ const router = express.Router();
 
 // Get all pending articles
 router.get("/articles", verifyToken, async (req, res) => {
+  // Check if user is admin
+  if (req.user.role !== "ADMIN") {
+    return res.status(403).json({ message: "Not authorized" });
+  }
+  
   const articles = await Article.find({ published: false });
   res.json(articles);
 });
 
 // Approve article
 router.put("/articles/:id/approve", verifyToken, async (req, res) => {
+  if (req.user.role !== "ADMIN") {
+    return res.status(403).json({ message: "Not authorized" });
+  }
+  
   const article = await Article.findById(req.params.id);
   if (!article) return res.status(404).json({ message: "Article not found" });
-
-  if (req.user.role !== "ADMIN") return res.status(403).json({ message: "Not authorized" });
 
   article.published = true;
   await article.save();
@@ -25,12 +32,20 @@ router.put("/articles/:id/approve", verifyToken, async (req, res) => {
 
 // Get all users
 router.get("/users", verifyToken, async (req, res) => {
+  if (req.user.role !== "ADMIN") {
+    return res.status(403).json({ message: "Not authorized" });
+  }
+  
   const users = await User.find();
   res.json(users);
 });
 
 // Promote user
 router.put("/users/:id/promote", verifyToken, async (req, res) => {
+  if (req.user.role !== "ADMIN") {
+    return res.status(403).json({ message: "Not authorized" });
+  }
+  
   const { role } = req.body;
   const user = await User.findById(req.params.id);
   if (!user) return res.status(404).json({ message: "User not found" });
@@ -42,6 +57,10 @@ router.put("/users/:id/promote", verifyToken, async (req, res) => {
 
 // Delete user
 router.delete("/users/:id", verifyToken, async (req, res) => {
+  if (req.user.role !== "ADMIN") {
+    return res.status(403).json({ message: "Not authorized" });
+  }
+  
   const user = await User.findByIdAndDelete(req.params.id);
   if (!user) return res.status(404).json({ message: "User not found" });
   res.json({ message: "User deleted successfully" });
