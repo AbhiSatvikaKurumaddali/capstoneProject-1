@@ -11,137 +11,141 @@ const { sign } = jwt;
 
 export const commonApp = exp.Router();
 
-commonApp.post("/users", async (req, res) => {
+// REMOVE THIS - Registration should be in userAPI.js, not here
+// commonApp.post("/users", async (req, res) => { ... });
+
+// LOGIN - Fixed
+commonApp.post("/login", async (req, res) => {
+  console.log("Login route hit");
+  console.log("Request body:", req.body); // Debug log
+  
   try {
-    const newUser = req.body;
+    const { email, password } = req.body;
 
-    let allowedRoles = ["USER", "AUTHOR"];
-    if (!allowedRoles.includes(newUser.role)) {
-      return res.status(400).json({ message: "Invalid role" });
+    // Check if email and password exist
+    if (!email || !password) {
+      return res.status(400).json({ 
+        message: "Email and password are required" 
+      });
     }
 
-    if (!newUser.email || !newUser.password) {
-      return res.status(400).json({ message: "Missing fields" });
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    newUser.password = await hash(newUser.password, 12);
+    const isMatched = await compare(password, user.password);
 
-    const newUserDoc = new UserModel(newUser);
-    await newUserDoc.save();
+    if (!isMatched) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
 
-    res.status(201).json({ message: "User Created" });
+    // FIXED: Use JWT_SECRET (not SECRET_KEY) to match your Render env variable
+    const signedToken = sign(
+      { id: user._id, email: email, role: user.role },
+      process.env.JWT_SECRET,  // Changed from SECRET_KEY
+      { expiresIn: "1h" }
+    );
+
+    res.cookie("token", signedToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none"
+    });
+
+    const userObj = user.toObject();
+    delete userObj.password;
+
+    res.status(200).json({
+      message: "Login successful",
+      payload: userObj
+    });
   } catch (err) {
-    console.log("REGISTER ERROR:", err);
-    res.status(500).json({
-      message: "Server error during registration",
-      error: err.message
+    console.error("Login error:", err);
+    res.status(500).json({ 
+      message: "Server error during login",
+      error: err.message 
     });
   }
 });
-commonApp.post("/login", async (req, res) => {
-  console.log("login route hit");
-  const { email, password } = req.body;
 
-  const user = await UserModel.findOne({ email });
-
-  if (!user) {
-    return res.status(400).json({ message: "Invalid email" });
-  }
-
-  const isMatched = await compare(password, user.password);
-
-  if (!isMatched) {
-    return res.status(400).json({ message: "Invalid password" });
-  }
-
-  const signedToken = sign(
-    { id: user._id, email: email, role: user.role },
-    process.env.SECRET_KEY,
-    { expiresIn: "1h" }
-  );
-
-  res.cookie("token", signedToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none"
-  });
-
-  const userObj = user.toObject();
-  delete userObj.password;
-
-  res.status(200).json({
-    message: "login successfull",
-    payload: userObj
-  });
-});
-
+// LOGOUT - Fixed
 commonApp.get("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: true,
     sameSite: "none",
-    path:"/"
+    path: "/"
   });
 
   res.status(200).json({ message: "Logout success" });
 });
 
-commonApp.put(
-  "/password",
-  verifyToken("USER", "AUTHOR", "ADMIN"),
-  async (req, res) => {
-    const clientPasswords = req.body;
-
-    if (clientPasswords.currentPassword === clientPasswords.newPassword) {
-      return res
-        .status(400)
-        .json({ message: "current password and new password are same" });
-    }
-
-    const id = req.user?.id;
-
-    const currentUser = await UserModel.findById(id);
-
-    const status = await compare(
-      clientPasswords.currentPassword,
-      currentUser.password
-    );
-
-    if (!status) {
-      return res.status(401).json({ message: "Invalid current password" });
-    }
-
-    const hashedPassword = await hash(clientPasswords.newPassword, 12);
-
-    await UserModel.findByIdAndUpdate(
-      { _id: id },
-      { password: hashedPassword },
-      { new: true }
-    );
-
-    res.status(200).json({ message: "password updated" });
-  }
-);
-
+// CHECK AUTH - Fixed
 commonApp.get("/check-auth", (req, res) => {
   try {
     const token = req.cookies.token;
 
     if (!token) {
       return res.status(401).json({
-        message: "No token"
+        message: "No token found"
       });
     }
 
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    // FIXED: Use JWT_SECRET (not SECRET_KEY)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     res.status(200).json({
       message: "Authenticated",
       payload: decoded
     });
   } catch (err) {
+    console.error("Check auth error:", err);
     res.status(401).json({
-      message: "Invalid token"
+      message: "Invalid or expired token"
     });
   }
 });
+
+// Password update - Keep as is
+commonApp.put(
+  "/password",
+  verifyToken("USER", "AUTHOR", "ADMIN"),
+  async (req, res) => {
+    try {
+      const clientPasswords = req.body;
+
+      if (clientPasswords.currentPassword === clientPasswords.newPassword) {
+        return res
+          .status(400)
+          .json({ message: "Current password and new password are the same" });
+      }
+
+      const id = req.user?.id;
+      const currentUser = await UserModel.findById(id);
+
+      const status = await compare(
+        clientPasswords.currentPassword,
+        currentUser.password
+      );
+
+      if (!status) {
+        return res.status(401).json({ message: "Invalid current password" });
+      }
+
+      const hashedPassword = await hash(clientPasswords.newPassword, 12);
+
+      await UserModel.findByIdAndUpdate(
+        { _id: id },
+        { password: hashedPassword },
+        { new: true }
+      );
+
+      res.status(200).json({ message: "Password updated" });
+    } catch (err) {
+      console.error("Password update error:", err);
+      res.status(500).json({ message: "Server error", error: err.message });
+    }
+  }
+);
