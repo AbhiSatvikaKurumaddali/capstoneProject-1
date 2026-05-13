@@ -40,9 +40,9 @@ function AdminProfile() {
   const toggleStatus = async (user) => {
     try {
       await axios.put(
-        "https://blogapp-00eh.onrender.com/admin-api/userStatus",
+        "https://atp-1.onrender.com/admin-api/userStatus",
         {
-          email: user.email,
+          email: user.email, //FIXED (was userId before)
           isUserActive: !user.isUserActive,
         },
         { withCredentials: true },
@@ -63,13 +63,11 @@ function AdminProfile() {
       ) : (
         list.map((user) => (
           <div
-            key={user.email || user._id}
+            key={user.email} // unique key fix
             className="border p-4 mb-3 rounded flex justify-between items-center"
           >
             <div>
-              <p className="font-medium">
-                {user.firstName} {user.lastName || ''}
-              </p>
+              <p>{user.firstName}</p>
               <p className="text-sm text-gray-500">{user.email}</p>
               <p>Status: {user.isUserActive ? "Active" : "Blocked"}</p>
             </div>
@@ -99,10 +97,7 @@ function AdminProfile() {
 
           <div>
             <p className="text-sm text-gray-500">Admin Panel</p>
-            <h2 className="text-xl font-semibold">
-              {currentUser?.firstName} {currentUser?.lastName || ''}
-            </h2>
-            <p className="text-sm text-gray-500">{currentUser?.email}</p>
+            <h2 className="text-xl font-semibold">{currentUser?.firstName}</h2>
           </div>
         </div>
 
@@ -123,5 +118,4 @@ function AdminProfile() {
   );
 }
 
-// MAKE SURE THIS LINE EXISTS AT THE END
 export default AdminProfile;
