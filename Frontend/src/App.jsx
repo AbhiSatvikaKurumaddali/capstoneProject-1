@@ -25,15 +25,15 @@ function App() {
           element: <Home />,
         },
         {
-          path: "Register",
+          path: "register",
           element: <Register />,
         },
         {
-          path: "Login",
+          path: "login",
           element: <Login />,
         },
         {
-          path: "UserProfile",
+          path: "userProfile",
           element: (
             <ProtectedRoute allowedRoles={["USER"]}>
               <UserProfile />
@@ -41,7 +41,7 @@ function App() {
           ),
         },
         {
-          path: "AdminProfile",
+          path: "adminProfile",
           element: (
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminProfile />
@@ -49,7 +49,7 @@ function App() {
           ),
         },
         {
-          path: "Author",
+          path: "author",
           element: (
             <ProtectedRoute allowedRoles={["AUTHOR"]}>
               <Author />
@@ -66,7 +66,7 @@ function App() {
               element: <AuthorArticles />,
             },
             {
-              path: "WriteArticles",
+              path: "writeArticles",
               element: <WriteArticles />,
             },
           ],
