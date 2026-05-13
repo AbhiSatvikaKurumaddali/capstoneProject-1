@@ -1,4 +1,3 @@
-
 // src/styles/common.js
 // Theme: Apple Light — white/f5f5f7 background, #1d1d1f text, #0066cc accent
 // Inspired by apple.com — no gradients, no shadows, pure typography & spacing
