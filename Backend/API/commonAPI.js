@@ -56,7 +56,7 @@ commonApp.post("/login", async (req, res) => {
 
   const signedToken = sign(
     { id: user._id, email: email, role: user.role },
-    process.env.SECRET_KEY,
+    process.env.JWT_SECRET,
     { expiresIn: "1h" }
   );
 
