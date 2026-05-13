@@ -39,42 +39,67 @@ commonApp.post("/users", async (req, res) => {
   }
 });
 commonApp.post("/login", async (req, res) => {
-  console.log("login route hit");
-  const { email, password } = req.body;
+  try {
+    console.log("login route hit");
 
-  const user = await UserModel.findOne({ email });
+    console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
-  if (!user) {
-    return res.status(400).json({ message: "Invalid email" });
+    const { email, password } = req.body;
+
+    const user = await UserModel.findOne({ email });
+
+    console.log("USER:", user);
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid email"
+      });
+    }
+
+    const isMatched = await compare(
+      password,
+      user.password
+    );
+
+    if (!isMatched) {
+      return res.status(400).json({
+        message: "Invalid password"
+      });
+    }
+
+    const signedToken = sign(
+      {
+        id: user._id,
+        email: email,
+        role: user.role
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.cookie("token", signedToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none"
+    });
+
+    const userObj = user.toObject();
+
+    delete userObj.password;
+
+    res.status(200).json({
+      message: "login successful",
+      payload: userObj
+    });
+
+  } catch (err) {
+    console.log("LOGIN ERROR:", err);
+
+    res.status(500).json({
+      message: err.message
+    });
   }
-
-  const isMatched = await compare(password, user.password);
-
-  if (!isMatched) {
-    return res.status(400).json({ message: "Invalid password" });
-  }
-
-  const signedToken = sign(
-    { id: user._id, email: email, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" }
-  );
-
-  res.cookie("token", signedToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none"
-  });
-
-  const userObj = user.toObject();
-  delete userObj.password;
-
-  res.status(200).json({
-    message: "login successfull",
-    payload: userObj
-  });
 });
-
 commonApp.get("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
