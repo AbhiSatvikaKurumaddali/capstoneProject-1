@@ -1,4 +1,3 @@
-
 import { useParams, useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -231,5 +230,9 @@ function ArticleByID() {
 
 export default ArticleByID;
 
+// {
+//   "user":"6989799b7013502767d3f82b",
+//   "articleId":"6989750220ce5bf826ec4f7e",
+//   "comment":"good article"
 
-
+// }
