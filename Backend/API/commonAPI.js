@@ -133,7 +133,7 @@ commonApp.get("/check-auth", (req, res) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     res.status(200).json({
       message: "Authenticated",
