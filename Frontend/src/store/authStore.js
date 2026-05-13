@@ -17,7 +17,7 @@ export const useAuth = create((set) => ({
       });
 
       let res = await axios.post(
-        "https://atp-vj9u.onrender.com/common-api/login",
+        "https://blogapp-00eh.onrender.com/common-api/login",
         userCred,
         { withCredentials: true },
       );
@@ -48,7 +48,7 @@ export const useAuth = create((set) => ({
       set({ loading: true });
 
       let res = await axios.get(
-        "https://atp-vj9u.onrender.com/common-api/logout",
+        "https://blogapp-00eh.onrender.com/common-api/logout",
         { withCredentials: true },
       );
 
@@ -78,7 +78,7 @@ export const useAuth = create((set) => ({
       set({ loading: true });
 
       const res = await axios.get(
-        "https://atp-vj9u.onrender.com/common-api/check-auth",
+        "https://blogapp-00eh.onrender.com/common-api/check-auth",
         { withCredentials: true },
       );
 
