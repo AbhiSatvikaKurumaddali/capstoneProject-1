@@ -66,7 +66,7 @@ function App() {
               element: <AuthorArticles />,
             },
             {
-              path: "WQriteArticles",
+              path: "WriteArticles",
               element: <WriteArticles />,
             },
           ],
