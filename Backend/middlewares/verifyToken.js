@@ -20,7 +20,7 @@ export const verifyToken = (...allowedRoles) => {
         return res.status(401).json({ message: "Please login first" });
       }
 
-      const decodedToken = verify(token, process.env.SECRET_KEY);
+      const decodedToken = verify(token, process.env.JWT_SECRET);
 
       if (!allowedRoles.includes(decodedToken.role)) {
         return res.status(403).json({ message: "You are unauthorised" });
