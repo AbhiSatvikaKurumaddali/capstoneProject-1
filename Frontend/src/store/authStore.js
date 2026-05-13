@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import axios from "axios";
 
@@ -18,7 +17,7 @@ export const useAuth = create((set) => ({
       });
 
       let res = await axios.post(
-        "https://blogapp-00eh.onrender.com/common-api/login",
+        "https://atp-vj9u.onrender.com/common-api/login",
         userCred,
         { withCredentials: true },
       );
@@ -49,7 +48,7 @@ export const useAuth = create((set) => ({
       set({ loading: true });
 
       let res = await axios.get(
-        "https://blogapp-00eh.onrender.com/common-api/logout",
+        "https://atp-vj9u.onrender.com/common-api/logout",
         { withCredentials: true },
       );
 
@@ -79,7 +78,7 @@ export const useAuth = create((set) => ({
       set({ loading: true });
 
       const res = await axios.get(
-        "https://blogapp-00eh.onrender.com/common-api/check-auth",
+        "https://atp-vj9u.onrender.com/common-api/check-auth",
         { withCredentials: true },
       );
 
