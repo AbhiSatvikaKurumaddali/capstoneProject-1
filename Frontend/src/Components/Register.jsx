@@ -1,114 +1,163 @@
-import { useState } from "react";
-import { NavLink, useNavigate } from "react-router";
-import { useForm } from "react-hook-form";
-import axios from "axios";
-import { toast } from "react-hot-toast";
 import {
-  pageBackground,
-  formCard,
-  formTitle,
-  formGroup,
-  labelClass,
-  inputClass,
-  submitBtn,
+  divider,
   errorClass,
+  formCard,
+  formGroup,
+  formTitle,
+  inputClass,
+  labelClass,
+  pageBackground,
+  submitBtn,
   mutedText,
-  linkClass,
 } from "../styles/common";
+import { useForm } from "react-hook-form";
+import { NavLink } from "react-router";
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router";
 
 function Register() {
+  let navigate=useNavigate()
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-
-  const navigate = useNavigate();
-  const [serverError, setServerError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState(null);
 
-  const onUserRegister = async (userData) => {
-    setLoading(true);
-    setServerError(null);
-    
+  //When user registration submitted
+  const onUserRegister = async (userObj) => {
     try {
-      // FIXED: Correct endpoint - /user-api/register instead of /users
-      const response = await axios.post(
-        "https://blogapp-00eh.onrender.com/user-api/register",
-        {
-          firstName: userData.firstName,
-          lastName: userData.lastName || "",
-          email: userData.email.trim().toLowerCase(),
-          password: userData.password,
-          role: "USER" // Default role
-        },
-        { withCredentials: true }
+      //start loading
+      setLoading(true)
+      console.log(userObj)
+      //make http request to create user
+      let res = await axios.post(
+        "https://blogapp-00eh.onrender.com/common-api/users",
+        userObj
       );
       
-      if (response.status === 201) {
-        toast.success("Registration successful! Please login.");
-        navigate("/login");
+      if(res.status==201)
+        //navigate to  login
+      navigate("/Login")
       }
-    } catch (err) {
-      console.error("Registration error:", err);
-      const errorMessage = err.response?.data?.message || "Registration failed";
-      setServerError(errorMessage);
-      toast.error(errorMessage);
+    catch (err) {
+      console.log("err in registration", err);
+      setApiError(err.response?.data?.error || "Registration failed");
     } finally {
       setLoading(false);
     }
+    
   };
+  if (loading) {
+    return <p className="text-center text-4xl">Loading....</p>;
+  }
+  if (apiError) {
+    return <p className="text-red-500 text-center text-3xl">{errors.message}</p>;
+  }
 
   return (
-    <div className={`${pageBackground} flex items-center justify-center py-16 px-4`}>
+    <div
+      className={`${pageBackground} flex items-center justify-center py-16 px-4`}
+    >
       <div className={formCard}>
-        <h2 className={formTitle}>Create Account</h2>
+        <h2 className={formTitle}>Create an Account</h2>
 
-        {serverError && (
-          <p className={errorClass}>{serverError}</p>
-        )}
+        {/* API Error */}
+        {/* {apiError && <p className={errorClass}>{apiError}</p>} */}
 
         <form onSubmit={handleSubmit(onUserRegister)}>
-          {/* First Name */}
-          <div className={formGroup}>
-            <label className={labelClass}>First Name *</label>
-            <input
-              type="text"
-              placeholder="John"
-              className={inputClass}
-              {...register("firstName", {
-                required: "First name is required",
-              })}
-            />
-            {errors.firstName && (
-              <p className={errorClass}>{errors.firstName.message}</p>
-            )}
+          {/* ROLE */}
+          <div className="mb-5">
+            <p className={labelClass}>Register as</p>
+
+            <div className="flex gap-6 mt-1">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  value="USER"
+                  {...register("role", {
+                    required: "Please select a role",
+                  })}
+                  className="accent-blue-600 w-4 h-4"
+                />
+                <span className="text-sm">User</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  value="AUTHOR"
+                  {...register("role", {
+                    required: "Please select a role",
+                  })}
+                  className="accent-blue-600 w-4 h-4"
+                />
+                <span className="text-sm">Author</span>
+              </label>
+            </div>
+
+            {errors.role && <p className={errorClass}>{errors.role.message}</p>}
           </div>
 
-          {/* Last Name */}
-          <div className={formGroup}>
-            <label className={labelClass}>Last Name</label>
-            <input
-              type="text"
-              placeholder="Doe"
-              className={inputClass}
-              {...register("lastName")}
-            />
+          <div className={divider} />
+
+          {/* NAME */}
+          <div className="sm:flex gap-4 mb-4">
+            <div className="flex-1">
+              <label className={labelClass}>First Name</label>
+              <input
+                type="text"
+                className={inputClass}
+                placeholder="First name"
+                {...register("firstName", {
+                  required: "First name is required",
+                  minLength: {
+                    value: 2,
+                    message: "At least 2 characters required",
+                  },
+                  maxLength: {
+                    value: 30,
+                    message: "Max 30 characters allowed",
+                  },
+                  validate: (v) => v.trim().length > 0 || "Cannot be empty",
+                })}
+              />
+              {errors.firstName && (
+                <p className={errorClass}>{errors.firstName.message}</p>
+              )}
+            </div>
+
+            <div className="flex-1">
+              <label className={labelClass}>Last Name</label>
+              <input
+                type="text"
+                className={inputClass}
+                placeholder="Last name"
+                {...register("lastName", {
+                  maxLength: {
+                    value: 30,
+                    message: "Max 30 characters allowed",
+                  },
+                })}
+              />
+              {errors.lastName && (
+                <p className={errorClass}>{errors.lastName.message}</p>
+              )}
+            </div>
           </div>
 
-          {/* Email */}
+          {/* EMAIL */}
           <div className={formGroup}>
-            <label className={labelClass}>Email *</label>
+            <label className={labelClass}>Email</label>
             <input
               type="email"
-              placeholder="you@example.com"
               className={inputClass}
+              placeholder="you@example.com"
               {...register("email", {
                 required: "Email is required",
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Invalid email address"
-                }
+                required: [true, "Password is required"],
               })}
             />
             {errors.email && (
@@ -116,19 +165,15 @@ function Register() {
             )}
           </div>
 
-          {/* Password */}
+          {/* PASSWORD */}
           <div className={formGroup}>
-            <label className={labelClass}>Password *</label>
+            <label className={labelClass}>Password</label>
             <input
               type="password"
-              placeholder="••••••••"
               className={inputClass}
+              placeholder="Min. 8 characters"
               {...register("password", {
                 required: "Password is required",
-                minLength: {
-                  value: 6,
-                  message: "Password must be at least 6 characters"
-                }
               })}
             />
             {errors.password && (
@@ -136,19 +181,32 @@ function Register() {
             )}
           </div>
 
-          <button 
-            type="submit" 
-            className={submitBtn}
-            disabled={loading}
-          >
-            {loading ? "Creating Account..." : "Sign Up"}
+          {/* PROFILE IMAGE */}
+          <div className={formGroup}>
+            <label className={labelClass}>Profile Image</label>
+
+            <input
+              type="text"
+              accept="image/png, image/jpeg"
+              {...register("profileImageUrl")}
+            />
+
+            {errors.profileImageUrl && (
+              <p className={errorClass}>{errors.profileImageUrl.message}</p>
+            )}
+          </div>
+
+          {/* SUBMIT */}
+          <button type="submit" className={submitBtn}>
+            Create Account
           </button>
         </form>
 
+        {/* FOOTER */}
         <p className={`${mutedText} text-center mt-5`}>
           Already have an account?{" "}
-          <NavLink to="/login" className={linkClass}>
-            Sign In
+          <NavLink to="/Login" className="text-[#0066cc] font-medium">
+            Sign in
           </NavLink>
         </p>
       </div>
