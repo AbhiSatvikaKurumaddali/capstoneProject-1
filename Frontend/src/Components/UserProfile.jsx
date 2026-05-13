@@ -1,4 +1,3 @@
-
 import { useAuth } from "../store/authStore";
 import { useNavigate } from "react-router";
 
@@ -30,7 +29,7 @@ function UserProfile() {
       try {
         //read articles of all authors
         let res = await axios.get(
-          "https://blogapp-00eh.onrender.com/articles",
+          "https://blogapp-00eh.onrender.com/user-api/articles",
           { withCredentials: true },
         );
         //update articles state
