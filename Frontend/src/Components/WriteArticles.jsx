@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
@@ -40,7 +39,7 @@ function WriteArticles() {
       setLoading(true);
       //make POST req to save new article
       let res = await axios.post(
-        "https://blogapp-00eh.onrender.com/article",
+        "https://blogapp-00eh.onrender.com/author-api/article",
         articleObj,
         { withCredentials: true },
       );
