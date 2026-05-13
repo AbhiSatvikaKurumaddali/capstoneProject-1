@@ -20,8 +20,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://blogappp-80k9.onrender.com",
-      "https://blogapp-00eh.onrender.com"
+      "https://blogappp-80k9.onrender.com"
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
