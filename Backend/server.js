@@ -36,7 +36,7 @@ app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-connect(process.env.DB_URI)
+connect(process.env.DB_URL)
   .then(() => {
     const PORT = process.env.PORT || 4000;
     app.listen(PORT, () => {
