@@ -1,16 +1,75 @@
-# React + Vite
+BlogApp Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+frontend for the BlogApp project, styled with **TailwindCSS** and powered by **Zustand** for state management. It integrates with the backend APIs to provide a seamless blogging experience.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Features
+- Fast development with **Vite**
+- Styling with **TailwindCSS**
+- Routing using **React Router**
+- API calls with **Axios**
+- Form handling via **React Hook Form**
+- Notifications with **React Hot Toast**
+- State management using **Zustand**
+- Linting with **ESLint**
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Installation Guide:
 
-## Expanding the ESLint configuration
+npm install
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+react, react-dom → UI framework
+
+react-router-dom → routing
+
+axios → API requests
+
+zustand → state management
+
+react-hook-form → form handling
+
+react-hot-toast → notifications
+
+tailwindcss + @tailwindcss/vite → styling
+
+
+Frontend/
+│── src/
+│   ├── Components/
+│   │   ├── Admin.jsx
+│   │   ├── AdminProfile.jsx
+│   │   ├── ArticleByID.jsx
+│   │   ├── Author.jsx
+│   │   ├── AuthorArticles.jsx
+│   │   ├── EditArticle.jsx
+│   │   ├── Footer.jsx
+│   │   ├── Header.jsx
+│   │   ├── Home.jsx
+│   │   ├── Login.jsx
+│   │   ├── ProtectedRoute.jsx
+│   │   ├── Register.jsx
+│   │   ├── RootLayout.jsx
+│   │   ├── Unauthorized.jsx
+│   │   ├── UserProfile.jsx
+│   │   └── WriteArticles.jsx
+│   ├── store/
+│   │   └── authStore.js
+│   ├── styles/
+│   │   └── common.js
+│   ├── App.css
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
+│── .env
+│── .gitignore
+│── README.md
+│── eslint.config.js
+│── index.html
+│── package-lock.json
+│── package.json
+│── vite.config.js
+
+Start development server:
+npm run dev       
