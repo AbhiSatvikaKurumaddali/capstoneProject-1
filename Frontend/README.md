@@ -34,7 +34,7 @@ react-hot-toast → notifications
 
 tailwindcss + @tailwindcss/vite → styling
 
-
+```
 Frontend/
 │── src/
 │   ├── Components/
@@ -70,6 +70,6 @@ Frontend/
 │── package-lock.json
 │── package.json
 │── vite.config.js
-
+```
 Start development server:
 npm run dev       
