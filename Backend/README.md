@@ -25,7 +25,7 @@ Features
 - cookie-parser
 
 
-
+```
 blogapp-Backend
 │── API/
 │   ├── adminAPI.js
@@ -44,7 +44,7 @@ blogapp-Backend
 │── adminrequest.http
 │── authorrequest.http
 │── userrequest.http
-
+```
 Running the Server:
 npm run dev
 
